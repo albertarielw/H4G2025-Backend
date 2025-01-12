@@ -10,11 +10,12 @@ CREATE TABLE users (
 
 -- 2) ITEMS
 CREATE TABLE items (
-    id      VARCHAR(36) PRIMARY KEY,
-    name    VARCHAR(255) NOT NULL,
-    image   BYTEA,               -- Storing image as a blob/bytea
-    stock   INT NOT NULL,
-    price   INT NOT NULL
+    id          VARCHAR(36) PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    image       BYTEA,               -- Storing image as a blob/bytea
+    stock       INT NOT NULL,
+    price       INT NOT NULL,
+    description TEXT
 );
 
 -- 3) TASKS

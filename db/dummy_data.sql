@@ -12,13 +12,13 @@ VALUES
 ------------------------------------------------------------------------------
 -- ITEMS
 ------------------------------------------------------------------------------
-INSERT INTO items (id, name, image, stock, price)
+INSERT INTO items (id, name, image, stock, price, description)
 VALUES
-('i0001', 'Laptop', NULL,  5,   1200),
-('i0002', 'Phone',  NULL,  10,  800),
-('i0003', 'Monitor',NULL,  3,   300),
-('i0004', 'Headset',NULL,  20,  50),
-('i0005', 'Keyboard',NULL, 15,  90);
+('i0001', 'Laptop', NULL,  5,   1200, 'This is an item.'),
+('i0002', 'Phone',  NULL,  10,  800, 'This is an item.'),
+('i0003', 'Monitor',NULL,  3,   300, 'This is an item.'),
+('i0004', 'Headset',NULL,  20,  50, 'This is an item.'),
+('i0005', 'Keyboard',NULL, 15,  90, 'This is an item.');
 
 ------------------------------------------------------------------------------
 -- TASKS

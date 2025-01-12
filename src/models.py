@@ -23,6 +23,7 @@ class Item(db.Model):
     image = db.Column(db.LargeBinary)
     stock = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.Text)
 
     def __repr__(self):
         return f"<Item {self.id} {self.name}>"

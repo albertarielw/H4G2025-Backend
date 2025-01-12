@@ -10,6 +10,7 @@ def get_user_by_uid(uid):
     /users/${uid} - GET
     Returns user details, tasks (empty if admin), transactions (empty if admin).
     """
+    print(uid)
     user = User.query.filter_by(uid=uid).first()
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
@@ -28,7 +29,14 @@ def get_user_by_uid(uid):
         tasks_data.append({
             "id": t.id,
             "name": t.name,
-            "description": t.description
+            "created_by": t.created_by,
+            "reward": t.reward,
+            "deadline": t.deadline,
+            "user_limit": t.user_limit,
+            "description": t.description,
+            "require_review": t.require_review,
+            "require_proof": t.require_proof,
+            "is_recurring": t.is_recurring,
         })
 
     trans_data = []
@@ -36,6 +44,7 @@ def get_user_by_uid(uid):
         trans_data.append({
             "id": tr.id,
             "item": tr.item,
+            "uid": tr.uid,
             "quantity": tr.quantity,
             "status": tr.status
         })
