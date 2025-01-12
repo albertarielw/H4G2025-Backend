@@ -20,7 +20,7 @@ class Item(db.Model):
     __tablename__ = 'items'
     id = db.Column(db.String(36), primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    image = db.Column(db.LargeBinary)
+    image = db.Column(db.Text)
     stock = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text)
