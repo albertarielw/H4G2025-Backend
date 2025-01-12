@@ -14,11 +14,11 @@ VALUES
 ------------------------------------------------------------------------------
 INSERT INTO items (id, name, image, stock, price, description)
 VALUES
-('i0001', 'Laptop', NULL,  5,   1200, 'This is an item.'),
-('i0002', 'Phone',  NULL,  10,  800, 'This is an item.'),
-('i0003', 'Monitor',NULL,  3,   300, 'This is an item.'),
-('i0004', 'Headset',NULL,  20,  50, 'This is an item.'),
-('i0005', 'Keyboard',NULL, 15,  90, 'This is an item.');
+('i0001', 'Laptop', 'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg',  5,   1200, 'This is an item.'),
+('i0002', 'Phone', 'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg',  10,  800, 'This is an item.'),
+('i0003', 'Monitor', 'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg',  3,   300, 'This is an item.'),
+('i0004', 'Headset', 'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg',  20,  50, 'This is an item.'),
+('i0005', 'Keyboard', 'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg', 15,  90, 'This is an item.');
 
 ------------------------------------------------------------------------------
 -- TASKS

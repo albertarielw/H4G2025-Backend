@@ -1,6 +1,7 @@
 # items.py
 from flask import Blueprint, request, jsonify
-from models import db, Item
+import uuid
+from models import db, Item, User, Transaction
 
 items_bp = Blueprint('items', __name__)
 
@@ -17,8 +18,9 @@ def get_all_items():
             "id": i.id,
             "name": i.name,
             "stock": i.stock,
-            "price": i.price
-            # image omitted, or handle appropriately
+            "price": i.price,
+            "description": i.description,
+            "image": i.image,
         })
     return jsonify({"items": items_list}), 200
 
@@ -37,7 +39,9 @@ def get_item_by_id(item_id):
             "id": item.id,
             "name": item.name,
             "stock": item.stock,
-            "price": item.price
+            "price": item.price,
+            "description": item.description,
+            "image": item.image,
         }
     }), 200
 
@@ -56,9 +60,10 @@ def create_item():
     new_item = Item(
         id=item_data.get("id"),
         name=item_data.get("name"),
-        image=None,  # handle base64 or file uploads if needed
+        image=item_data.get("image"),  
         stock=item_data.get("stock", 0),
-        price=item_data.get("price", 0)
+        price=item_data.get("price", 0),
+        description=item_data.get("description"),
     )
     db.session.add(new_item)
     db.session.commit()
@@ -84,6 +89,8 @@ def update_item():
     item.name = item_data.get("name", item.name)
     item.stock = item_data.get("stock", item.stock)
     item.price = item_data.get("price", item.price)
+    item.description=item_data.get("description", item.description)
+    item.image=item_data.get("image", item.image)
     db.session.commit()
     return jsonify({"success": True, "message": "Item updated"}), 200
 
@@ -109,23 +116,115 @@ def delete_item():
 def buy_item():
     """
     /items/buy - POST
-    Request: { "id": str, "quantity": int }
-    Creates or updates a transaction in the backend. 
+    Request: { "id": str, "quantity": int, "uid": str }
     """
-    # For simplicity, just a placeholder with success response
     data = request.get_json() or {}
     item_id = data.get("id")
     quantity = data.get("quantity")
-    # Logic to reduce item stock, create transaction, etc.
-    return jsonify({"success": True, "message": "Buy item not yet implemented"}), 200
+    user_id = data.get("uid")
+
+    if not item_id or not quantity or not user_id:
+        return jsonify({"success": False, "message": "Missing item_id, quantity, or user_id"}), 400
+
+    # 1) Get the item
+    item = Item.query.filter_by(id=item_id).first()
+    if not item:
+        return jsonify({"success": False, "message": "Item not found"}), 404
+
+    # 2) Check quantity vs. stock
+    if quantity <= 0:
+        return jsonify({"success": False, "message": "Invalid quantity"}), 400
+    
+    if quantity > item.stock:
+        return jsonify({"success": False, "message": "Requested quantity exceeds available stock"}), 400
+
+    # 3) Get the user
+    user = User.query.filter_by(uid=user_id).first()
+    if not user:
+        return jsonify({"success": False, "message": "User not found"}), 404
+
+    # 4) Check user credit vs. cost
+    total_price = quantity * item.price
+    if user.credit < total_price:
+        return jsonify({"success": False, "message": "Insufficient credit"}), 400
+
+    # At this point, we assume purchase is allowed to proceed
+    try:
+        # 5) Deduct stock
+        item.stock = item.stock - quantity
+
+        user.credit = user.credit - total_price
+
+        # 6) Insert transaction
+        transaction_id = str(uuid.uuid4())  # or any other logic for generating IDs
+        new_transaction = Transaction(
+            id=transaction_id,
+            item=item_id,
+            uid=user_id,
+            quantity=quantity,
+            status='AWAITING_CONF'  
+        )
+        db.session.add(new_transaction)
+
+        db.session.commit()
+
+        return jsonify({"success": True, "message": "Purchase successful", "transaction_id": transaction_id}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
 
 
 @items_bp.route('/items/preorder', methods=['POST'])
 def preorder_item():
     """
-    /items/preorder - POST
-    Request: { "id": str, "quantity": int }
+    /items/buy - POST
+    Request: { "id": str, "quantity": int, "uid": str }
     """
-    # Placeholder
     data = request.get_json() or {}
-    return jsonify({"success": True, "message": "Preorder not yet implemented"}), 200
+    item_id = data.get("id")
+    quantity = data.get("quantity")
+    user_id = data.get("uid")
+
+    if not item_id or not quantity or not user_id:
+        return jsonify({"success": False, "message": "Missing item_id, quantity, or user_id"}), 400
+
+    # 1) Get the item
+    item = Item.query.filter_by(id=item_id).first()
+    if not item:
+        return jsonify({"success": False, "message": "Item not found"}), 404
+
+    # 2) Check quantity
+    if quantity <= 0:
+        return jsonify({"success": False, "message": "Invalid quantity"}), 400
+
+    # 3) Get the user
+    user = User.query.filter_by(uid=user_id).first()
+    if not user:
+        return jsonify({"success": False, "message": "User not found"}), 404
+
+    # 4) Check user credit vs. cost
+    total_price = quantity * item.price
+    if user.credit < total_price:
+        return jsonify({"success": False, "message": "Insufficient credit"}), 400
+
+    # At this point, we assume purchase is allowed to proceed
+    try:
+        user.credit = user.credit - total_price
+
+        # 5) Insert transaction
+        transaction_id = str(uuid.uuid4())  # or any other logic for generating IDs
+        new_transaction = Transaction(
+            id=transaction_id,
+            item=item_id,
+            uid=user_id,
+            quantity=quantity,
+            status='PREORDER'  
+        )
+        db.session.add(new_transaction)
+
+        db.session.commit()
+
+        return jsonify({"success": True, "message": "Purchase successful", "transaction_id": transaction_id}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
