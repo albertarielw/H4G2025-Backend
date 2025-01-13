@@ -2,9 +2,11 @@
 import uuid
 
 from flask import Blueprint, request, jsonify
-from models import db, User, Task, Transaction
+from flask_jwt_extended import current_user
+from models import db, User, Task, Transaction, Log
 
 from permissions.utils import user_logged_in, protected_update
+from common.utils import generate_update_diff
 
 users_bp = Blueprint('users', __name__)
 
@@ -85,15 +87,26 @@ def add_user():
     if existing_user:
         return jsonify({"success": False, "message": "User already exists"}), 400
 
+    new_id = uuid.uuid4().hex
+    user_cat = user_data.get("cat", "USER")
+
     new_user = User(
-        uid=uuid.uuid4().hex,
+        uid=new_id,
         name=user_data.get("name"),
-        cat=user_data.get("cat", "USER"),
+        cat=user_cat,
         email=user_data.get("email"),
         password=user_data.get("password"),
         credit=user_data.get("credit", 0.0),
     )
     db.session.add(new_user)
+    db.session.commit()
+    log_item = Log(
+        uid=current_user.uid,
+        cat="USER",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} added new {user_cat} user {new_id}",
+    )
+    db.session.add(log_item)
     db.session.commit()
 
     return jsonify({"success": True, "message": "User added successfully"}), 201
@@ -116,6 +129,8 @@ def update_user():
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
 
+    diff = generate_update_diff(user, user_data)
+
     # Update fields
     protected_update(user, "name", user_data)
     protected_update(user, "cat", user_data, admin_only=True)
@@ -123,6 +138,14 @@ def update_user():
     protected_update(user, "password", user_data, admin_only=True)
     protected_update(user, "credit", user_data, admin_only=True)
     protected_update(user, "is_active", user_data, admin_only=True)
+    db.session.commit()
+    log_item = Log(
+        uid=current_user.uid,
+        cat="USER",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} made the following changes: {diff} on user {uid}",
+    )
+    db.session.add(log_item)
     db.session.commit()
     return jsonify({"success": True, "message": "User updated"}), 200
 
@@ -142,6 +165,13 @@ def suspend_user():
 
     user.is_active = False
     db.session.commit()
+    log_item = Log(
+        uid=current_user.uid,
+        cat="USER",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} suspended user {uid}",
+    )
+    db.session.add(log_item)
 
     return jsonify({"success": True, "message": f"User {uid} suspended"}), 200
 
@@ -160,5 +190,13 @@ def delete_user():
         return jsonify({"success": False, "message": "User not found"}), 404
 
     db.session.delete(user)
+    db.session.commit()
+    log_item = Log(
+        uid=current_user.uid,
+        cat="USER",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} deleted user {uid}",
+    )
+    db.session.add(log_item)
     db.session.commit()
     return jsonify({"success": True, "message": f"User {uid} deleted"}), 200
