@@ -4,7 +4,7 @@ import uuid
 from flask import Blueprint, request, jsonify
 from models import db, User, Task, Transaction
 
-from permissions.utils import user_logged_in
+from permissions.utils import user_logged_in, protected_update
 
 users_bp = Blueprint('users', __name__)
 
@@ -117,14 +117,12 @@ def update_user():
         return jsonify({"success": False, "message": "User not found"}), 404
 
     # Update fields
-    user.name = user_data.get("name", user.name)
-    user.cat = user_data.get("cat", user.cat)
-    user.email = user_data.get("email", user.email)
-    user.password = user_data.get("password", user.password)
-    # credit might come from business logic
-    if "credit" in user_data:
-        user.credit = user_data["credit"]
-
+    protected_update(user, "name", user_data)
+    protected_update(user, "cat", user_data, admin_only=True)
+    protected_update(user, "email", user_data, admin_only=True)
+    protected_update(user, "password", user_data, admin_only=True)
+    protected_update(user, "credit", user_data, admin_only=True)
+    protected_update(user, "is_active", user_data, admin_only=True)
     db.session.commit()
     return jsonify({"success": True, "message": "User updated"}), 200
 
