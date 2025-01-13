@@ -2,9 +2,12 @@
 from flask import Blueprint, request, jsonify
 from models import db, User, Task, Transaction
 
+from permissions.utils import user_logged_in
+
 users_bp = Blueprint('users', __name__)
 
-@users_bp.route('/users/<string:uid>', methods=['GET'])
+
+@users_bp.route("/users/<string:uid>", methods=["GET"])
 def get_user_by_uid(uid):
     """
     /users/${uid} - GET
@@ -63,7 +66,8 @@ def get_user_by_uid(uid):
     return jsonify(response), 200
 
 
-@users_bp.route('/users/add', methods=['POST'])
+@users_bp.route("/users/add", methods=["POST"])
+@user_logged_in(is_admin=True)
 def add_user():
     """
     /users/add - POST
@@ -93,7 +97,8 @@ def add_user():
     return jsonify({"success": True, "message": "User added successfully"}), 201
 
 
-@users_bp.route('/users/update', methods=['PATCH'])
+@users_bp.route("/users/update", methods=["PATCH"])
+@user_logged_in()
 def update_user():
     """
     /users/update - PATCH
@@ -122,7 +127,8 @@ def update_user():
     return jsonify({"success": True, "message": "User updated"}), 200
 
 
-@users_bp.route('/users/suspend', methods=['PATCH'])
+@users_bp.route("/users/suspend", methods=["PATCH"])
+@user_logged_in(is_admin=True)
 def suspend_user():
     """
     /users/suspend - PATCH
@@ -142,7 +148,8 @@ def suspend_user():
     return jsonify({"success": True, "message": f"User {uid} suspended"}), 200
 
 
-@users_bp.route('/users/delete', methods=['DELETE'])
+@users_bp.route("/users/delete", methods=["DELETE"])
+@user_logged_in(is_admin=True)
 def delete_user():
     """
     /users/delete - DELETE
