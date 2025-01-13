@@ -5,7 +5,8 @@ CREATE TABLE users (
     cat         VARCHAR(50) NOT NULL,  -- e.g. 'USER' or 'ADMIN'
     email       VARCHAR(255) UNIQUE NOT NULL,
     password    VARCHAR(255) NOT NULL,
-    credit      DECIMAL(10,2) DEFAULT 0.00
+    credit      DECIMAL(10,2) DEFAULT 0.00,
+    is_active   BOOLEAN DEFAULT TRUE
 );
 
 -- 2) ITEMS
