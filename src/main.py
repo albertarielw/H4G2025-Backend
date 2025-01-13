@@ -1,8 +1,8 @@
 # main.py
 from flask import Flask
-from flask_cors import CORS
 
-from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, SECRET_KEY
+from config import BaseConfig
+from configure_extensions import configure_extensions
 from models import db
 
 from login import login_bp
@@ -12,24 +12,22 @@ from tasks import tasks_bp
 from usertasks import usertasks_bp
 from itemrequests import itemrequests_bp
 
-def create_app():
-    app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
-    app.config['SECRET_KEY'] = SECRET_KEY
 
-    db.init_app(app)
-    CORS(app)
+def create_app(config_class=BaseConfig):
+    flask_app = Flask(__name__)
+    flask_app.config.from_object(config_class)
+    configure_extensions(flask_app)
 
     # Register Blueprints
-    app.register_blueprint(login_bp)
-    app.register_blueprint(users_bp)
-    app.register_blueprint(items_bp)
-    app.register_blueprint(tasks_bp)
-    app.register_blueprint(usertasks_bp)
-    app.register_blueprint(itemrequests_bp)
+    flask_app.register_blueprint(login_bp)
+    flask_app.register_blueprint(users_bp)
+    flask_app.register_blueprint(items_bp)
+    flask_app.register_blueprint(tasks_bp)
+    flask_app.register_blueprint(usertasks_bp)
+    flask_app.register_blueprint(itemrequests_bp)
 
-    return app
+    return flask_app
+
 
 if __name__ == '__main__':
     app = create_app()
