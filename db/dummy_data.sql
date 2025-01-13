@@ -1,7 +1,6 @@
 ------------------------------------------------------------------------------
 -- USERS
 ------------------------------------------------------------------------------
-DELETE FROM users;
 INSERT INTO users (uid, name, cat, email, password, credit)
 VALUES 
 ('u0001', 'Alice', 'USER', 'alice@example.com', 'alicepass',  10.00),
@@ -13,7 +12,6 @@ VALUES
 ------------------------------------------------------------------------------
 -- ITEMS
 ------------------------------------------------------------------------------
-DELETE from items;
 INSERT INTO items (id, name, image, stock, price, description)
 VALUES
 ('i0001', 'Laptop', 'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg',  5,   1200, 'This is an item.'),
@@ -25,7 +23,6 @@ VALUES
 ------------------------------------------------------------------------------
 -- TASKS
 ------------------------------------------------------------------------------
-DELETE from tasks;
 INSERT INTO tasks (id, name, created_by, reward, deadline, user_limit, description, 
                    require_review, require_proof, is_recurring)
 VALUES
@@ -38,7 +35,6 @@ VALUES
 ------------------------------------------------------------------------------
 -- USERTASKS
 ------------------------------------------------------------------------------
-DELETE from usertasks;
 INSERT INTO usertasks (uid, task, status, proof_of_completion)
 VALUES
 ('u0001', 't0001', 'APPLIED', NULL),
@@ -50,7 +46,6 @@ VALUES
 ------------------------------------------------------------------------------
 -- TRANSACTIONS
 ------------------------------------------------------------------------------
-DELETE from transactions;
 INSERT INTO transactions (id, item, uid, quantity, status)
 VALUES
 ('tr0001', 'i0001', 'u0001', 1, 'CONFIRMED'),
@@ -62,7 +57,6 @@ VALUES
 ------------------------------------------------------------------------------
 -- ITEMREQUESTS
 ------------------------------------------------------------------------------
-DELETE from itemrequests;
 INSERT INTO itemrequests (id, requested_by, description)
 VALUES
 ('ir0001', 'u0001', 'Requesting a stand for the monitor'),
@@ -74,7 +68,6 @@ VALUES
 ------------------------------------------------------------------------------
 -- LOGS
 ------------------------------------------------------------------------------
-DELETE from logs;
 INSERT INTO logs (id, cat, uid, timestamp, description)
 VALUES
 ('lg0001', 'USER', 'u0001', '2025-01-01 10:00:00+00', 'User logged in'),
