@@ -101,6 +101,7 @@ def add_user():
     db.session.add(new_user)
     db.session.commit()
     log_item = Log(
+        id=uuid.uuid4().hex,
         uid=current_user.uid,
         cat="USER",
         timestamp=db.func.current_timestamp(),
@@ -140,6 +141,7 @@ def update_user():
     protected_update(user, "is_active", user_data, admin_only=True)
     db.session.commit()
     log_item = Log(
+        id=uuid.uuid4().hex,
         uid=current_user.uid,
         cat="USER",
         timestamp=db.func.current_timestamp(),
@@ -166,6 +168,7 @@ def suspend_user():
     user.is_active = False
     db.session.commit()
     log_item = Log(
+        id=uuid.uuid4().hex,
         uid=current_user.uid,
         cat="USER",
         timestamp=db.func.current_timestamp(),
@@ -192,6 +195,7 @@ def delete_user():
     db.session.delete(user)
     db.session.commit()
     log_item = Log(
+        id=uuid.uuid4().hex,
         uid=current_user.uid,
         cat="USER",
         timestamp=db.func.current_timestamp(),
