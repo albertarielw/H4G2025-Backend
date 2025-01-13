@@ -1,4 +1,6 @@
 # users.py
+import uuid
+
 from flask import Blueprint, request, jsonify
 from models import db, User, Task, Transaction
 
@@ -84,12 +86,12 @@ def add_user():
         return jsonify({"success": False, "message": "User already exists"}), 400
 
     new_user = User(
-        uid=user_data.get("uid"),
+        uid=uuid.uuid4().hex,
         name=user_data.get("name"),
         cat=user_data.get("cat", "USER"),
         email=user_data.get("email"),
         password=user_data.get("password"),
-        credit=user_data.get("credit", 0.0)
+        credit=user_data.get("credit", 0.0),
     )
     db.session.add(new_user)
     db.session.commit()
