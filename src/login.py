@@ -1,6 +1,7 @@
 # login.py
 from flask import Blueprint, request, jsonify
 from models import db, User
+from flask_jwt_extended import create_access_token
 
 login_bp = Blueprint('login', __name__)
 
@@ -16,18 +17,16 @@ def login():
     password = data.get('password')
 
     if not email or not password:
-        return jsonify({"success": False, "uid": "", "message": "Missing credentials"}), 400
+        return jsonify({"success": False, "token": "", "message": "Missing credentials"}), 400
 
     user = User.query.filter_by(email=email, password=password).first()
     if not user:
-        return jsonify({"success": False, "uid": "", "message": "Invalid credentials"}), 401
+        return jsonify({"success": False, "token": "", "message": "Invalid credentials"}), 401
+
+    token = create_access_token(identity=user)
 
     # If login is successful, return uid
-    return jsonify({
-        "success": True,
-        "uid": user.uid,
-        "message": "Login successful"
-    }), 200
+    return jsonify({"success": True, "token": token, "message": "Login successful"}), 200
 
 
 @login_bp.route('/login/resetpassword', methods=['POST'])
