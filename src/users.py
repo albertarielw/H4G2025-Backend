@@ -140,9 +140,7 @@ def suspend_user():
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
 
-    # "Suspend" might be an application concept. Let's do something simple:
-    # e.g. set credit=0 or cat='SUSPENDED' or something.
-    user.cat = 'SUSPENDED'
+    user.is_active = False
     db.session.commit()
 
     return jsonify({"success": True, "message": f"User {uid} suspended"}), 200
