@@ -113,11 +113,11 @@ def add_user():
     return jsonify({"success": True, "message": "User added successfully"}), 201
 
 
-@users_bp.route("/users/update", methods=["PATCH"])
+@users_bp.route("/users/<string:uid>/update", methods=["PATCH"])
 @user_logged_in()
-def update_user():
+def update_user(uid):
     """
-    /users/update - PATCH
+    /users/<uid>/update - PATCH
     Request: { "user": {...fields...} }
     """
     data = request.get_json()
@@ -125,7 +125,6 @@ def update_user():
     if not user_data:
         return jsonify({"success": False, "message": "No user data in request"}), 400
 
-    uid = user_data.get("uid")
     user = User.query.filter_by(uid=uid).first()
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
@@ -152,15 +151,13 @@ def update_user():
     return jsonify({"success": True, "message": "User updated"}), 200
 
 
-@users_bp.route("/users/suspend", methods=["PATCH"])
+@users_bp.route("/users/<string:uid>/suspend", methods=["PATCH"])
 @user_logged_in(is_admin=True)
-def suspend_user():
+def suspend_user(uid):
     """
-    /users/suspend - PATCH
-    Request: { "uid": str }
+    /users/<uid>/suspend - PATCH
+    Request: {}
     """
-    data = request.get_json()
-    uid = data.get("uid")
     user = User.query.filter_by(uid=uid).first()
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
@@ -179,15 +176,13 @@ def suspend_user():
     return jsonify({"success": True, "message": f"User {uid} suspended"}), 200
 
 
-@users_bp.route("/users/delete", methods=["DELETE"])
+@users_bp.route("/users/<string:uid>/delete", methods=["DELETE"])
 @user_logged_in(is_admin=True)
-def delete_user():
+def delete_user(uid):
     """
-    /users/delete - DELETE
-    Request: { "uid": str }
+    /users/<uid>/delete - DELETE
+    Request: {}
     """
-    data = request.get_json()
-    uid = data.get("uid")
     user = User.query.filter_by(uid=uid).first()
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
