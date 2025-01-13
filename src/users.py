@@ -129,6 +129,9 @@ def update_user(uid):
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
 
+    if current_user.cat != "ADMIN" and current_user.uid != uid:
+        return jsonify({"success": False, "message": "You are not authorised to perform this action."}), 403
+
     diff = generate_update_diff(user, user_data)
 
     # Update fields
