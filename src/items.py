@@ -1,7 +1,9 @@
 # items.py
-from flask import Blueprint, request, jsonify
 import uuid
+
+from flask import Blueprint, request, jsonify
 from models import db, Item, User, Transaction
+from permissions.utils import user_logged_in
 
 items_bp = Blueprint('items', __name__)
 
@@ -46,7 +48,8 @@ def get_item_by_id(item_id):
     }), 200
 
 
-@items_bp.route('/items/create', methods=['POST'])
+@items_bp.route("/items/create", methods=["POST"])
+@user_logged_in(is_admin=True)
 def create_item():
     """
     /items/create - POST
@@ -70,7 +73,8 @@ def create_item():
     return jsonify({"success": True, "message": "Item created"}), 201
 
 
-@items_bp.route('/items/update', methods=['PATCH'])
+@items_bp.route("/items/update", methods=["PATCH"])
+@user_logged_in(is_admin=True)
 def update_item():
     """
     /items/update - PATCH
@@ -95,7 +99,8 @@ def update_item():
     return jsonify({"success": True, "message": "Item updated"}), 200
 
 
-@items_bp.route('/items/delete', methods=['DELETE'])
+@items_bp.route("/items/delete", methods=["DELETE"])
+@user_logged_in(is_admin=True)
 def delete_item():
     """
     /items/delete - DELETE
