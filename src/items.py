@@ -121,20 +121,26 @@ def update_item(item_id):
     return jsonify({"success": True, "message": "Item updated"}), 200
 
 
-@items_bp.route("/items/delete", methods=["DELETE"])
+@items_bp.route("/items/<string:item_id>/delete", methods=["DELETE"])
 @user_logged_in(is_admin=True)
-def delete_item():
+def delete_item(item_id):
     """
     /items/delete - DELETE
     Request: { "id": str }
     """
-    data = request.get_json() or {}
-    item_id = data.get("id")
     item = Item.query.filter_by(id=item_id).first()
     if not item:
         return jsonify({"success": False, "message": "Item not found"}), 404
 
     db.session.delete(item)
+    log_item = Log(
+        id=uuid.uuid4().hex,
+        uid=current_user.uid,
+        cat="ITEM",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} deleted item {item_id}",
+    )
+    db.session.add(log_item)
     db.session.commit()
     return jsonify({"success": True, "message": "Item deleted"}), 200
 
