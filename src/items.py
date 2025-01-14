@@ -5,7 +5,8 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import current_user
 
 from models import db, Item, User, Transaction, Log
-from permissions.utils import user_logged_in
+from permissions.utils import user_logged_in, protected_update
+from common.utils import generate_update_diff
 
 items_bp = Blueprint('items', __name__)
 
@@ -85,16 +86,15 @@ def create_item():
     return jsonify({"success": True, "message": "Item created"}), 201
 
 
-@items_bp.route("/items/update", methods=["PATCH"])
+@items_bp.route("/items/<string:item_id>/update", methods=["PATCH"])
 @user_logged_in(is_admin=True)
-def update_item():
+def update_item(item_id):
     """
     /items/update - PATCH
-    Request: { "item": {id, name, stock, price, ...} }
+    Request: { "item": {name, stock, price, ...} }
     """
     data = request.get_json() or {}
     item_data = data.get("item", {})
-    item_id = item_data.get("id")
     if not item_id:
         return jsonify({"success": False, "message": "Item ID required"}), 400
 
@@ -102,11 +102,21 @@ def update_item():
     if not item:
         return jsonify({"success": False, "message": "Item not found"}), 404
 
-    item.name = item_data.get("name", item.name)
-    item.stock = item_data.get("stock", item.stock)
-    item.price = item_data.get("price", item.price)
-    item.description=item_data.get("description", item.description)
-    item.image=item_data.get("image", item.image)
+    diff = generate_update_diff(item, item_data)
+
+    protected_update(item, "name", item_data, admin_only=True)
+    protected_update(item, "stock", item_data, admin_only=True)
+    protected_update(item, "price", item_data, admin_only=True)
+    protected_update(item, "description", item_data, admin_only=True)
+    protected_update(item, "image", item_data, admin_only=True)
+    log_item = Log(
+        id=uuid.uuid4().hex,
+        uid=current_user.uid,
+        cat="ITEM",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} made the following changes: {diff} on item {item_id}",
+    )
+    db.session.add(log_item)
     db.session.commit()
     return jsonify({"success": True, "message": "Item updated"}), 200
 
