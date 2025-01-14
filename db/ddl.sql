@@ -14,8 +14,8 @@ CREATE TABLE items (
     id          VARCHAR(36) PRIMARY KEY,
     name        VARCHAR(255) NOT NULL,
     image       TEXT,               -- Storing image as a blob/bytea
-    stock       INT NOT NULL,
-    price       INT NOT NULL,
+    stock       INT NOT NULL CHECK (stock >= 0),
+    price       INT NOT NULL CHECK (price >= 0),
     description TEXT
 );
 
