@@ -2,7 +2,9 @@
 import uuid
 
 from flask import Blueprint, request, jsonify
-from models import db, Item, User, Transaction
+from flask_jwt_extended import current_user
+
+from models import db, Item, User, Transaction, Log
 from permissions.utils import user_logged_in
 
 items_bp = Blueprint('items', __name__)
@@ -60,15 +62,25 @@ def create_item():
     if not item_data:
         return jsonify({"success": False, "message": "No item data provided"}), 400
 
+    item_id = uuid.uuid4().hex
+
     new_item = Item(
-        id=item_data.get("id"),
+        id=item_id,
         name=item_data.get("name"),
-        image=item_data.get("image"),  
+        image=item_data.get("image"),
         stock=item_data.get("stock", 0),
         price=item_data.get("price", 0),
         description=item_data.get("description"),
     )
     db.session.add(new_item)
+    log_item = Log(
+        id=uuid.uuid4().hex,
+        cat="ITEM",
+        uid=current_user.uid,
+        timestamp=db.func.current_timestamp(),
+        description=f"Item {item_id} created by {current_user.uid}",
+    )
+    db.session.add(log_item)
     db.session.commit()
     return jsonify({"success": True, "message": "Item created"}), 201
 
