@@ -1,6 +1,8 @@
 # itemrequests.py
 from flask import Blueprint, request, jsonify
 from models import db, ItemRequest
+from permissions.utils import user_logged_in
+import uuid
 
 itemrequests_bp = Blueprint('itemrequests', __name__)
 
@@ -21,6 +23,7 @@ def get_all_itemrequests():
 
 
 @itemrequests_bp.route('/itemrequests/create', methods=['POST'])
+@user_logged_in()
 def create_itemrequest():
     """
     /itemrequests/create - POST
@@ -31,17 +34,20 @@ def create_itemrequest():
     if not ir_data:
         return jsonify({"success": False, "message": "No itemrequest data"}), 400
 
+    ir_id = uuid.uuid4().hex
+
     new_ir = ItemRequest(
-        id=ir_data.get("id"),
+        id=ir_id,
         requested_by=ir_data.get("requested_by"),
         description=ir_data.get("description")
     )
     db.session.add(new_ir)
     db.session.commit()
-    return jsonify({"success": True, "message": "ItemRequest created"}), 201
+    return jsonify({"success": True, "id": ir_id, "message": "ItemRequest created"}), 201
 
 
 @itemrequests_bp.route('/itemrequests/update', methods=['PATCH'])
+@user_logged_in()
 def update_itemrequest():
     """
     /itemrequests/update - PATCH

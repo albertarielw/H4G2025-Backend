@@ -1,6 +1,8 @@
 # tasks.py
+import uuid
 from flask import Blueprint, request, jsonify
-from models import db, Task
+from permissions.utils import user_logged_in, protected_update
+from models import db, Task, UserTask
 
 tasks_bp = Blueprint('tasks', __name__)
 
@@ -22,6 +24,7 @@ def get_all_tasks():
 
 
 @tasks_bp.route('/tasks/create', methods=['POST'])
+@user_logged_in(is_admin=True)
 def create_task():
     """
     /tasks/create - POST
@@ -32,12 +35,14 @@ def create_task():
     if not task_data:
         return jsonify({"success": False, "message": "No task data"}), 400
 
+    task_id = uuid.uuid4().hex
+    
     new_task = Task(
-        id=task_data.get("id"),
+        id=task_id,
         name=task_data.get("name"),
         created_by=task_data.get("created_by"),
         reward=task_data.get("reward", 0.0),
-        deadline=task_data.get("deadline"),   # format: "YYYY-MM-DD HH:MM:SS+00"
+        deadline=task_data.get("deadline"),
         user_limit=task_data.get("user_limit", 0),
         description=task_data.get("description"),
         require_review=task_data.get("require_review", False),
@@ -46,10 +51,11 @@ def create_task():
     )
     db.session.add(new_task)
     db.session.commit()
-    return jsonify({"success": True, "message": "Task created"}), 201
+    return jsonify({"success": True, "id": task_id, "message": "Task created"}), 201
 
 
 @tasks_bp.route('/tasks/update', methods=['PATCH'])
+@user_logged_in(is_admin=True)
 def update_task():
     """
     /tasks/update - PATCH
@@ -79,6 +85,7 @@ def update_task():
 
 
 @tasks_bp.route('/tasks/delete', methods=['DELETE'])
+@user_logged_in(is_admin=True)
 def delete_task():
     """
     /tasks/delete - DELETE
@@ -96,20 +103,72 @@ def delete_task():
 
 
 @tasks_bp.route('/tasks/apply', methods=['POST'])
+@user_logged_in()
 def apply_task():
     """
     /tasks/apply - POST
-    Request: { "id": str, "uid": str }
+    Request JSON: { "id": <task_id>, "uid": <user_id> }
+      - 'id' is the ID of the Task
+      - 'uid' is the ID of the User
     """
     data = request.get_json() or {}
-    return jsonify({"success": True, "message": "Apply not yet implemented"}), 200
+    task_id = data.get("id")
+    user_id = data.get("uid")
+
+    # Validate input
+    if not task_id or not user_id:
+        return jsonify({"success": False, "message": "Task ID and User ID are required"}), 400
+
+    # Optionally, you may check if the Task or User exist in DB
+    task = Task.query.filter_by(id=task_id).first()
+    if not task:
+        return jsonify({"success": False, "message": "Task not found"}), 404
+
+    usertask_id = uuid.uuid4().hex
+
+    new_user_task = UserTask(
+        id=usertask_id,
+        uid=user_id,
+        task=task_id,
+        status='APPLIED',
+        proof_of_completion=None,
+        admin_comment=None
+    )
+
+    db.session.add(new_user_task)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "id": usertask_id,
+        "message": "Task application successful"
+    }), 201
 
 
 @tasks_bp.route('/tasks/cancel', methods=['POST'])
+@user_logged_in()
 def cancel_task():
     """
     /tasks/cancel - POST
-    Request: { "id": str, "uid": str }
+    Request JSON: { "id": <usertask_id> }
+      - 'id' is the ID of the UserTask
     """
     data = request.get_json() or {}
-    return jsonify({"success": True, "message": "Cancel not yet implemented"}), 200
+    usertask_id = data.get("id")
+
+    # Validate input
+    if not usertask_id:
+        return jsonify({"success": False, "message": "UserTask ID is required"}), 400
+
+    # Find the usertask record
+    usertask = UserTask.query.filter_by(id=usertask_id).first()
+    if not usertask:
+        return jsonify({"success": False, "message": "UserTask not found"}), 404
+    
+    db.session.delete(usertask)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Task canceled successfully"
+    }), 200

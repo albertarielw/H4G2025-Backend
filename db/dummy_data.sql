@@ -1,13 +1,13 @@
 ------------------------------------------------------------------------------
 -- USERS
 ------------------------------------------------------------------------------
-INSERT INTO users (uid, name, cat, email, password, credit)
+INSERT INTO users (uid, name, cat, email, password, credit, is_active)
 VALUES 
-('u0001', 'Alice', 'USER', 'alice@example.com', 'alicepass',  10.00),
-('u0002', 'Bob',   'ADMIN', 'bob@example.com',   'bobpass',   100.00),
-('u0003', 'Charlie', 'USER', 'charlie@example.com', 'charliepass',  25.50),
-('u0004', 'Diana', 'USER', 'diana@example.com', 'dianapass',  5.00),
-('u0005', 'Eve',   'USER', 'eve@example.com',   'evepass',    0.00);
+('u0001', 'Alice', 'USER', 'alice@example.com', 'alicepass',  10.00, TRUE),
+('u0002', 'Bob',   'ADMIN', 'bob@example.com',   'bobpass',   100.00, TRUE),
+('u0003', 'Charlie', 'USER', 'charlie@example.com', 'charliepass',  25.50, TRUE),
+('u0004', 'Diana', 'USER', 'diana@example.com', 'dianapass',  5.00, TRUE),
+('u0005', 'Eve',   'USER', 'eve@example.com',   'evepass',    0.00, TRUE);
 
 ------------------------------------------------------------------------------
 -- ITEMS
@@ -35,13 +35,13 @@ VALUES
 ------------------------------------------------------------------------------
 -- USERTASKS
 ------------------------------------------------------------------------------
-INSERT INTO usertasks (uid, task, status, proof_of_completion)
+INSERT INTO usertasks (id, uid, task, status, proof_of_completion, admin_comment)
 VALUES
-('u0001', 't0001', 'APPLIED', NULL),
-('u0001', 't0002', 'REJECTED', NULL),
-('u0003', 't0003', 'ONGOING', NULL),
-('u0004', 't0004', 'COMPLETED', NULL),
-('u0005', 't0005', 'APPLIED', NULL);
+('ut0001', 'u0001', 't0001', 'APPLIED', NULL, ''),
+('ut0002', 'u0001', 't0002', 'REJECTED', NULL, ''),
+('ut0003', 'u0003', 't0003', 'ONGOING', NULL, ''),
+('ut0004', 'u0004', 't0004', 'COMPLETED', NULL, ''),
+('ut0005', 'u0005', 't0005', 'APPLIED', NULL, '');
 
 ------------------------------------------------------------------------------
 -- TRANSACTIONS
