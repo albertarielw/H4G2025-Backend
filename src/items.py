@@ -83,7 +83,7 @@ def create_item():
     )
     db.session.add(log_item)
     db.session.commit()
-    return jsonify({"success": True, "message": "Item created"}), 201
+    return jsonify({"success": True, "id": item_id, "message": "Item created"}), 201
 
 
 @items_bp.route("/items/<string:item_id>/update", methods=["PATCH"])
@@ -146,6 +146,7 @@ def delete_item(item_id):
 
 
 @items_bp.route('/items/buy', methods=['POST'])
+@user_logged_in()
 def buy_item():
     """
     /items/buy - POST
@@ -189,7 +190,7 @@ def buy_item():
         user.credit = user.credit - total_price
 
         # 6) Insert transaction
-        transaction_id = str(uuid.uuid4())  # or any other logic for generating IDs
+        transaction_id = uuid.uuid4().hex
         new_transaction = Transaction(
             id=transaction_id,
             item=item_id,
@@ -208,6 +209,7 @@ def buy_item():
 
 
 @items_bp.route('/items/preorder', methods=['POST'])
+@user_logged_in()
 def preorder_item():
     """
     /items/buy - POST
@@ -245,7 +247,7 @@ def preorder_item():
         user.credit = user.credit - total_price
 
         # 5) Insert transaction
-        transaction_id = str(uuid.uuid4())  # or any other logic for generating IDs
+        transaction_id = uuid.uuid4().hex
         new_transaction = Transaction(
             id=transaction_id,
             item=item_id,

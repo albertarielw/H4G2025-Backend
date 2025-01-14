@@ -35,11 +35,12 @@ CREATE TABLE tasks (
 
 -- 4) USERTASK (Association between User and Task)
 CREATE TABLE usertasks (
-    id                  SERIAL PRIMARY KEY,  -- If you need an auto-inc ID
+    id                  VARCHAR(36) PRIMARY KEY,
     uid                VARCHAR(36) NOT NULL REFERENCES users(uid),
     task                VARCHAR(36) NOT NULL REFERENCES tasks(id),
     status              VARCHAR(50) NOT NULL,  -- e.g. 'APPLIED', 'REJECTED', 'ONGOING', 'COMPLETED'
-    proof_of_completion BYTEA
+    proof_of_completion BYTEA,
+    admin_comment   TEXT
 );
 
 -- 5) TRANSACTIONS

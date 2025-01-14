@@ -49,11 +49,13 @@ class Task(db.Model):
 
 class UserTask(db.Model):
     __tablename__ = 'usertasks'
-    id = db.Column(db.Integer, primary_key=True)  # SERIAL
+    
+    id = db.Column(db.String(36), primary_key=True)
     uid = db.Column(db.String(36), db.ForeignKey('users.uid'), nullable=False)
     task = db.Column(db.String(36), db.ForeignKey('tasks.id'), nullable=False)
-    status = db.Column(db.String(50), nullable=False)  # e.g. 'APPLIED', etc.
-    proof_of_completion = db.Column(db.LargeBinary)
+    status = db.Column(db.String(50), nullable=False)  # 'APPLIED', 'REJECTED', 'ONGOING', 'COMPLETED'
+    proof_of_completion = db.Column(db.LargeBinary, nullable=True)
+    admin_comment = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return f"<UserTask {self.id} uid={self.uid} task={self.task}>"

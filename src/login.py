@@ -10,7 +10,7 @@ def login():
     """
     /login - POST
     Request: { "email": str, "password": str }
-    Response: { "success": bool, "uid": str, "message": str }
+    Response: { "success": bool, "message": str, "token": str }
     """
     data = request.get_json() or {}
     email = data.get('email')

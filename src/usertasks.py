@@ -1,5 +1,6 @@
 # usertasks.py
 from flask import Blueprint, request, jsonify
+from permissions.utils import user_logged_in, protected_update
 from models import db, UserTask
 
 usertasks_bp = Blueprint('usertasks', __name__)
@@ -20,29 +21,8 @@ def get_all_usertasks():
         })
     return jsonify({"usertask": output}), 200
 
-
-@usertasks_bp.route('/usertasks/add', methods=['POST'])
-def add_usertask():
-    """
-    /usertasks/add - POST
-    Request: { "usertask": UserTask }
-    """
-    data = request.get_json() or {}
-    ut_data = data.get("usertask", {})
-    if not ut_data:
-        return jsonify({"success": False, "message": "No usertask data"}), 400
-
-    new_ut = UserTask(
-        uid=ut_data.get("uid"),
-        task=ut_data.get("task"),
-        status=ut_data.get("status", "APPLIED")
-    )
-    db.session.add(new_ut)
-    db.session.commit()
-    return jsonify({"success": True, "message": "UserTask added"}), 201
-
-
 @usertasks_bp.route('/usertasks/update', methods=['PATCH'])
+@user_logged_in()
 def update_usertask():
     """
     /usertasks/update - PATCH
@@ -58,15 +38,16 @@ def update_usertask():
     if not usertask:
         return jsonify({"success": False, "message": "UserTask not found"}), 404
 
-    usertask.uid = ut_data.get("uid", usertask.uid)
-    usertask.task = ut_data.get("task", usertask.task)
     usertask.status = ut_data.get("status", usertask.status)
+    usertask.proof_of_completion =  ut_data.get("proof_of_completion", usertask.proof_of_completion)
+    usertask.admin_comment = ut_data.get("admin_comment", usertask.admin_comment)
 
     db.session.commit()
     return jsonify({"success": True, "message": "UserTask updated"}), 200
 
 
 @usertasks_bp.route('/usertasks/delete', methods=['DELETE'])
+@user_logged_in(is_admin=True)
 def delete_usertask():
     """
     /usertasks/delete - DELETE
