@@ -1,6 +1,13 @@
 # tasks.py
+import uuid
+import datetime
+
 from flask import Blueprint, request, jsonify
-from models import db, Task
+from flask_jwt_extended import current_user
+from models import db, Task, TaskRequest, Log
+
+from permissions.utils import user_logged_in
+from common.utils import create_user_tasks
 
 tasks_bp = Blueprint('tasks', __name__)
 
@@ -95,7 +102,90 @@ def delete_task():
     return jsonify({"success": True, "message": "Task deleted"}), 200
 
 
-@tasks_bp.route('/tasks/apply', methods=['POST'])
+@tasks_bp.route("/tasks/requests", methods=["POST"])
+@user_logged_in()
+def request_task():
+    request_data = request.get_json()
+
+    if current_user.cat == "ADMIN":
+        return jsonify({"success": False, "message": "Please create tasks through the admin portal instead."}), 403
+
+    end_time = request_data.get("end_time")
+    if end_time < datetime.datetime.now():
+        return jsonify({"success": False, "message": "End time must be in the future."}), 400
+
+    task_request = TaskRequest(
+        id=uuid.uuid4().hex,
+        created_by=current_user.uid,
+        name=request_data.get("name"),
+        description=request_data.get("description"),
+        reward=request_data.get("reward", 0.0),
+        status="PENDING",
+        start_time=request_data.get("start_time"),
+        end_time=end_time,
+        recurrence_interval=request_data.get("recurrence_interval"),
+    )
+    db.session.add(task_request)
+    db.session.commit()
+    return jsonify({"success": True, "message": "Task request created"}), 201
+
+
+@tasks_bp.route("/tasks/requests/<string:request_id>/review", methods=["POST"])
+@user_logged_in(is_admin=True)
+def review_task_request(request_id):
+    """
+    /tasks/requests/<request_id>/review - POST
+    Request: { "will_approve": bool, "comment": str, "require_review": bool, "require_proof": bool }
+    """
+    data = request.get_json() or {}
+    if not (will_approve := data.get("will_approve")):
+        return jsonify({"success": False, "message": "Please pass the will_approve argument."}), 400
+
+    task_request = TaskRequest.query.filter_by(id=request_id).first()
+    if not task_request:
+        return jsonify({"success": False, "message": "Task request not found"}), 404
+
+    if will_approve:
+        task_request.status = "APPROVED"
+        task_request.comment = data.get("comment")
+        new_task = Task(
+            id=uuid.uuid4().hex,
+            name=task_request.name,
+            created_by=current_user.uid,
+            reward=task_request.reward,
+            start_time=task_request.start_time,
+            end_time=task_request.end_time,
+            recurrence_interval=task_request.recurrence_interval,
+            description=task_request.description,
+            require_review=data.get("require_review"),
+            require_proof=data.get("require_proof"),
+        )
+        user_tasks = create_user_tasks(new_task, task_request.created_by)
+        log_item = Log(
+            id=uuid.uuid4().hex,
+            uid=current_user.uid,
+            cat="TASK",
+            timestamp=db.func.current_timestamp(),
+            description=f"Admin {current_user.uid} approved task request {task_request.id}",
+        )
+        db.session.add(new_task)
+        db.session.add_all(user_tasks)
+    else:
+        task_request.status = "REJECTED"
+        task_request.comment = data.get("comment")
+        log_item = Log(
+            id=uuid.uuid4().hex,
+            uid=current_user.uid,
+            cat="TASK",
+            timestamp=db.func.current_timestamp(),
+            description=f"Admin {current_user.uid} rejected task request {task_request.id}",
+        )
+    db.session.add(log_item)
+    db.session.commit()
+    return jsonify({"success": True, "message": "Task request reviewed"}), 20
+
+
+@tasks_bp.route("/tasks/apply", methods=["POST"])
 def apply_task():
     """
     /tasks/apply - POST
