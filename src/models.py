@@ -50,14 +50,9 @@ class Task(db.Model):
 class TaskPosting(db.Model):
     __tablename__ = "task_postings"
     id = db.Column(db.String(36), primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    created_by = db.Column(db.String(36), db.ForeignKey("users.uid"), nullable=False)
-    reward = db.Column(db.Numeric(10, 2), default=0.00)
-    start_time = db.Column(db.DateTime(timezone=True))
-    end_time = db.Column(db.DateTime(timezone=True))
-    recurrence_interval = db.Column(db.Integer)  # e.g. 1 for daily, 7 for weekly
+    task = db.Column(db.String(36), db.ForeignKey("tasks.id"), nullable=False)
     user_limit = db.Column(db.Integer, default=0)
-    description = db.Column(db.Text)
+    is_open = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f"<TaskPosting {self.id} {self.name}>"
@@ -100,6 +95,7 @@ class UserTask(db.Model):
     end_time = db.Column(db.DateTime(timezone=True))
     status = db.Column(db.String(50), nullable=False)  # e.g. 'APPLIED', etc.
     proof_of_completion = db.Column(db.LargeBinary)
+    admin_comment = db.Column(db.Text)
 
     def __repr__(self):
         return f"<UserTask {self.id} uid={self.uid} task={self.task}>"

@@ -35,14 +35,9 @@ CREATE TABLE tasks (
 
 CREATE TABLE task_postings (
     id                  VARCHAR(36) PRIMARY KEY,
-    name                VARCHAR(255) NOT NULL,
-    created_by          VARCHAR(36) NOT NULL REFERENCES users(uid),
-    reward              DECIMAL(10,2) DEFAULT 0.00 CHECK (reward >= 0),
-    start_time          TIMESTAMP WITH TIME ZONE,
-    end_time            TIMESTAMP WITH TIME ZONE,
-    recurrence_interval INT,  -- e.g. 1 for daily, 7 for weekly, etc. Not recurring if NULL
+    task                VARCHAR(36) NOT NULL REFERENCES tasks(id),
     user_limit          INT DEFAULT 0,
-    description         TEXT
+    is_open             BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE task_applications (
@@ -72,8 +67,9 @@ CREATE TABLE usertasks (
     task                VARCHAR(36) NOT NULL REFERENCES tasks(id),
     start_time          TIMESTAMP WITH TIME ZONE,
     end_time            TIMESTAMP WITH TIME ZONE,
-    status              VARCHAR(50) NOT NULL,  -- e.g. 'ONGOING', 'UNDER_REVIEW', 'COMPLETED'
-    proof_of_completion BYTEA
+    status              VARCHAR(50) NOT NULL,  -- e.g. 'ONGOING', 'CHANGES_REQUESTED", 'UNDER_REVIEW', 'COMPLETED'
+    proof_of_completion BYTEA,
+    admin_comment       TEXT
 );
 
 -- 5) TRANSACTIONS
