@@ -21,26 +21,55 @@ CREATE TABLE items (
 
 -- 3) TASKS
 CREATE TABLE tasks (
+    id                  VARCHAR(36) PRIMARY KEY,
+    name                VARCHAR(255) NOT NULL,
+    created_by          VARCHAR(36) NOT NULL REFERENCES users(uid),
+    reward              DECIMAL(10,2) DEFAULT 0.00 CHECK (reward >= 0),
+    start_time          TIMESTAMP WITH TIME ZONE,
+    end_time            TIMESTAMP WITH TIME ZONE,
+    recurrence_interval INT,  -- e.g. 1 for daily, 7 for weekly, etc. Not recurring if NULL
+    description         TEXT,
+    require_review      BOOLEAN DEFAULT FALSE,
+    require_proof       BOOLEAN DEFAULT FALSE,
+);
+
+CREATE TABLE task_postings (
+    id                  VARCHAR(36) PRIMARY KEY,
+    task                VARCHAR(36) NOT NULL REFERENCES tasks(id),
+    user_limit          INT DEFAULT 0,
+    is_open             BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE task_applications (
     id              VARCHAR(36) PRIMARY KEY,
-    name            VARCHAR(255) NOT NULL,
-    created_by      VARCHAR(36) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
-    reward          DECIMAL(10,2) DEFAULT 0.00,
-    deadline        TIMESTAMP WITH TIME ZONE,
-    user_limit      INT DEFAULT 0,
-    description     TEXT,
-    require_review  BOOLEAN DEFAULT FALSE,
-    require_proof   BOOLEAN DEFAULT FALSE,
-    is_recurring    BOOLEAN DEFAULT FALSE
+    posting         VARCHAR(36) NOT NULL REFERENCES task_postings(id),
+    user            VARCHAR(36) NOT NULL REFERENCES users(uid),
+    status          VARCHAR(50) NOT NULL,  -- e.g. 'PENDING', 'APPROVED', 'REJECTED'
+    comment         TEXT
+);
+
+CREATE TABLE task_requests (
+    id                      VARCHAR(36) PRIMARY KEY,
+    created_by              VARCHAR(36) NOT NULL REFERENCES users(uid),
+    name                    VARCHAR(255) NOT NULL,
+    description             TEXT,
+    reward                  DECIMAL(10,2) DEFAULT 0.00 CHECK (reward >= 0),
+    status                  VARCHAR(50) NOT NULL,  -- e.g. 'PENDING', 'APPROVED', 'REJECTED'
+    start_time              TIMESTAMP WITH TIME ZONE,
+    end_time                TIMESTAMP WITH TIME ZONE,
+    recurrence_interval     INT,  -- e.g. 1 for daily, 7 for weekly, etc. Not recurring if NULL
 );
 
 -- 4) USERTASK (Association between User and Task)
 CREATE TABLE usertasks (
     id                  VARCHAR(36) PRIMARY KEY,
-    uid                 VARCHAR(36) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
-    task                VARCHAR(36) NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-    status              VARCHAR(50) NOT NULL,  -- e.g. 'APPLIED', 'REJECTED', 'ONGOING', 'COMPLETED'
+    uid                 VARCHAR(36) NOT NULL REFERENCES users(uid),
+    task                VARCHAR(36) NOT NULL REFERENCES tasks(id),
+    start_time          TIMESTAMP WITH TIME ZONE,
+    end_time            TIMESTAMP WITH TIME ZONE,
+    status              VARCHAR(50) NOT NULL,  -- e.g. 'ONGOING', 'CHANGES_REQUESTED", 'UNDER_REVIEW', 'COMPLETED'
     proof_of_completion BYTEA,
-    admin_comment   TEXT
+    admin_comment       TEXT
 );
 
 -- 5) TRANSACTIONS

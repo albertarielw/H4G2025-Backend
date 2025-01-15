@@ -33,18 +33,21 @@ def get_user_by_uid(uid):
     # Convert tasks to simple dict
     tasks_data = []
     for t in tasks:
-        tasks_data.append({
-            "id": t.id,
-            "name": t.name,
-            "created_by": t.created_by,
-            "reward": t.reward,
-            "deadline": t.deadline,
-            "user_limit": t.user_limit,
-            "description": t.description,
-            "require_review": t.require_review,
-            "require_proof": t.require_proof,
-            "is_recurring": t.is_recurring,
-        })
+        tasks_data.append(
+            {
+                "id": t.id,
+                "name": t.name,
+                "created_by": t.created_by,
+                "reward": t.reward,
+                "start_time": t.start_time,
+                "end_time": t.end_time,
+                "recurrence_interval": t.recurrence_interval,
+                "user_limit": t.user_limit,
+                "description": t.description,
+                "require_review": t.require_review,
+                "require_proof": t.require_proof,
+            }
+        )
 
     trans_data = []
     for tr in transactions:
