@@ -19,12 +19,20 @@ def get_all_tasks():
     tasks = Task.query.all()
     tasks_list = []
     for t in tasks:
-        tasks_list.append({
-            "id": t.id,
-            "name": t.name,
-            "deadline": t.deadline.isoformat() if t.deadline else None,
-            "description": t.description
-        })
+        tasks_list.append(
+            {
+                "id": t.id,
+                "name": t.name,
+                "created_by": t.created_by,
+                "reward": t.reward,
+                "start_time": t.start_time,
+                "end_time": t.end_time,
+                "recurrence_interval": t.recurrence_interval,
+                "description": t.description,
+                "require_review": t.require_review,
+                "require_proof": t.require_proof,
+            }
+        )
     return jsonify({"tasks": tasks_list}), 200
 
 
@@ -41,18 +49,19 @@ def create_task():
         return jsonify({"success": False, "message": "No task data"}), 400
 
     task_id = uuid.uuid4().hex
-    
+
     new_task = Task(
         id=task_id,
         name=task_data.get("name"),
         created_by=task_data.get("created_by"),
         reward=task_data.get("reward", 0.0),
-        deadline=task_data.get("deadline"),
+        start_time=task_data.get("start_time"),
+        end_time=task_data.get("end_time"),
+        recurrence_interval=task_data.get("recurrence_interval"),
         user_limit=task_data.get("user_limit", 0),
         description=task_data.get("description"),
         require_review=task_data.get("require_review", False),
         require_proof=task_data.get("require_proof", False),
-        is_recurring=task_data.get("is_recurring", False),
     )
     db.session.add(new_task)
     db.session.commit()
@@ -78,12 +87,13 @@ def update_task():
 
     task.name = task_data.get("name", task.name)
     task.reward = task_data.get("reward", task.reward)
-    task.deadline = task_data.get("deadline", task.deadline)
+    task.start_time = task_data.get("start_time", task.start_time)
+    task.end_time = task_data.get("end_time", task.end_time)
+    task.recurrence_interval = task_data.get("recurrence_interval", task.recurrence_interval)
     task.user_limit = task_data.get("user_limit", task.user_limit)
     task.description = task_data.get("description", task.description)
     task.require_review = task_data.get("require_review", task.require_review)
     task.require_proof = task_data.get("require_proof", task.require_proof)
-    task.is_recurring = task_data.get("is_recurring", task.is_recurring)
 
     db.session.commit()
     return jsonify({"success": True, "message": "Task updated"}), 200
