@@ -106,7 +106,30 @@ def delete_task():
     db.session.commit()
     return jsonify({"success": True, "message": "Task deleted"}), 200
 
+
 ## TASK REQUESTS ##
+@tasks_bp.route("/tasks/requests/all", methods=["GET"])
+def get_all_requests():
+    """
+    /tasks/requests/all - GET
+    """
+    requests = TaskRequest.query.all()
+    requests_list = []
+    for r in requests:
+        requests_list.append(
+            {
+                "id": r.id,
+                "name": r.name,
+                "description": r.description,
+                "reward": r.reward,
+                "status": r.status,
+                "start_time": r.start_time,
+                "end_time": r.end_time,
+                "recurrence_interval": r.recurrence_interval,
+            }
+        )
+    return jsonify({"requests": requests_list}), 200
+
 
 @tasks_bp.route("/tasks/requests", methods=["POST"])
 @user_logged_in()
@@ -557,3 +580,31 @@ def review_task_submission(usertask_id):
     db.session.add(log_item)
     db.session.commit()
     return jsonify({"success": True, "message": "Task submission reviewed"}), 200
+
+
+## USER TASKS ##
+@tasks_bp.route("/tasks/usertasks", methods=["GET"])
+def get_all_usertasks():
+    """
+    /tasks/usertasks - GET
+    Optional parameter: uid
+    """
+    user_id = request.args.get("uid")
+    if user_id:
+        usertasks = UserTask.query.filter_by(uid=user_id).all()
+    else:
+        usertasks = UserTask.query.all()
+
+    usertasks_list = []
+    for ut in usertasks:
+        usertasks_list.append(
+            {
+                "id": ut.id,
+                "uid": ut.uid,
+                "task": ut.task,
+                "status": ut.status,
+                "proof_of_completion": ut.proof_of_completion,
+                "admin_comment": ut.admin_comment,
+            }
+        )
+    return jsonify({"usertasks": usertasks_list}), 200
