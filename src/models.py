@@ -87,7 +87,7 @@ class Log(db.Model):
     __tablename__ = 'logs'
     id = db.Column(db.String(36), primary_key=True)
     cat = db.Column(db.String(50), nullable=False)  # e.g. 'USER', 'TRANSACTION', ...
-    uid = db.Column(db.String(36), db.ForeignKey('users.uid'))
+    uid = db.Column(db.String(36))
     timestamp = db.Column(db.DateTime(timezone=True), default=db.func.current_timestamp())
     description = db.Column(db.Text)
 
