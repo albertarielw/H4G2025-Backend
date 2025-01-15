@@ -1,8 +1,10 @@
 # itemrequests.py
 from flask import Blueprint, request, jsonify
-from models import db, ItemRequest
+from models import db, ItemRequest, Log
 from permissions.utils import user_logged_in
 import uuid
+from flask_jwt_extended import current_user
+from common.utils import generate_update_diff
 
 itemrequests_bp = Blueprint('itemrequests', __name__)
 
@@ -42,6 +44,16 @@ def create_itemrequest():
         description=ir_data.get("description")
     )
     db.session.add(new_ir)
+
+    log_item = Log(
+        id=uuid.uuid4().hex,
+        uid=current_user.uid,
+        cat="ITEMREQUEST",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} created ItemRequest {ir_id}: {new_ir}",
+    )
+    db.session.add(log_item)
+
     db.session.commit()
     return jsonify({"success": True, "id": ir_id, "message": "ItemRequest created"}), 201
 
@@ -62,9 +74,21 @@ def update_itemrequest():
     ir = ItemRequest.query.filter_by(id=ir_id).first()
     if not ir:
         return jsonify({"success": False, "message": "ItemRequest not found"}), 404
+    
+    diff = generate_update_diff(ir, ir_data)
 
     ir.requested_by = ir_data.get("requested_by", ir.requested_by)
     ir.description = ir_data.get("description", ir.description)
+
+    log_item = Log(
+        id=uuid.uuid4().hex,
+        uid=current_user.uid,
+        cat="ITEMREQUEST",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} updated ItemRequest {ir_id}: {diff}",
+    )
+    db.session.add(log_item)
+
     db.session.commit()
     return jsonify({"success": True, "message": "ItemRequest updated"}), 200
 
@@ -82,6 +106,16 @@ def delete_itemrequest(ir_id):
 
     # Delete the ItemRequest
     db.session.delete(item_request)
+
+    log_item = Log(
+        id=uuid.uuid4().hex,
+        uid=current_user.uid,
+        cat="ITEMREQUEST",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} deleted ItemRequest {ir_id}",
+    )
+    db.session.add(log_item)
+
     db.session.commit()
 
     return jsonify({"success": True, "message": f"ItemRequest {ir_id} deleted successfully"}), 200

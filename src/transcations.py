@@ -1,8 +1,10 @@
 # transactions.py
 import uuid
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import current_user
 from permissions.utils import user_logged_in, protected_update
-from models import db, Transaction
+from models import db, Transaction, Log
+from common.utils import generate_update_diff
 
 transactions_bp = Blueprint("transactions", __name__)
 
@@ -99,6 +101,8 @@ def update_transaction():
     transaction = Transaction.query.filter_by(id=tx_id).first()
     if not transaction:
         return jsonify({"success": False, "message": "Transaction not found"}), 404
+    
+    diff = generate_update_diff(transaction, tx_data)
 
     # Update fields if provided
     # (You may add your own validation or business rules here)
@@ -117,6 +121,15 @@ def update_transaction():
     new_status = tx_data.get("status")
     if new_status is not None:
         transaction.status = new_status
+
+    log_item = Log(
+        id=uuid.uuid4().hex,
+        uid=current_user.uid,
+        cat="TRANSACTION",
+        timestamp=db.func.current_timestamp(),
+        description=f"User {current_user.uid} updated transaction {tx_id}: {diff}",
+    )
+    db.session.add(log_item)
 
     db.session.commit()
 

@@ -200,6 +200,15 @@ def buy_item():
         )
         db.session.add(new_transaction)
 
+        log_item = Log(
+            id=uuid.uuid4().hex,
+            uid=current_user.uid,
+            cat="TRANSACTION",
+            timestamp=db.func.current_timestamp(),
+            description=f"Created transaction {transaction_id}. User {current_user.uid} bought {quantity} {item_id} ({item})",
+        )
+        db.session.add(log_item)
+
         db.session.commit()
 
         return jsonify({"success": True, "message": "Purchase successful", "transaction_id": transaction_id}), 200
@@ -256,6 +265,15 @@ def preorder_item():
             status='PREORDER'  
         )
         db.session.add(new_transaction)
+
+        log_item = Log(
+            id=uuid.uuid4().hex,
+            uid=current_user.uid,
+            cat="TRANSACTION",
+            timestamp=db.func.current_timestamp(),
+            description=f"Created transaction {transaction_id}. User {current_user.uid} preordered {quantity} {item_id} ({item})",
+        )
+        db.session.add(log_item)
 
         db.session.commit()
 
