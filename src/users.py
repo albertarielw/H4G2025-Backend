@@ -75,7 +75,7 @@ def get_user_by_uid(uid):
 def add_user():
     """
     /users/add - POST
-    Request: { "user": {uid, name, cat, email, password, credit} }
+    Request: { "user": {name, cat, email, password, credit} }
     """
     data = request.get_json()
     user_data = data.get("user", {})
@@ -97,6 +97,7 @@ def add_user():
         email=user_data.get("email"),
         password=user_data.get("password"),
         credit=user_data.get("credit", 0.0),
+        is_active=True,
     )
     db.session.add(new_user)
     db.session.commit()
@@ -110,8 +111,7 @@ def add_user():
     db.session.add(log_item)
     db.session.commit()
 
-    return jsonify({"success": True, "message": "User added successfully"}), 201
-
+    return jsonify({"success": True, "uid": new_id, "message": "User added successfully"}), 201
 
 @users_bp.route("/users/<string:uid>/update", methods=["PATCH"])
 @user_logged_in()
