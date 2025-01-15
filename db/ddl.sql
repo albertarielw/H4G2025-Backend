@@ -75,8 +75,8 @@ CREATE TABLE usertasks (
 -- 5) TRANSACTIONS
 CREATE TABLE transactions (
     id       VARCHAR(36) PRIMARY KEY,
-    item     VARCHAR(36) NOT NULL REFERENCES items(id),
-    uid     VARCHAR(36) NOT NULL REFERENCES users(uid),
+    item     VARCHAR(36) NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+    uid     VARCHAR(36) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
     quantity INT NOT NULL,
     status   VARCHAR(50) NOT NULL  -- e.g. 'PREORDER', 'AWAITING_CONF', 'CONFIRMED', 'CLAIMED', 'CANCELED'
 );
@@ -84,7 +84,7 @@ CREATE TABLE transactions (
 -- 6) ITEMREQUEST
 CREATE TABLE itemrequests (
     id            VARCHAR(36) PRIMARY KEY,
-    requested_by  VARCHAR(36) NOT NULL REFERENCES users(uid),
+    requested_by  VARCHAR(36) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
     description   TEXT NOT NULL
 );
 
@@ -92,7 +92,7 @@ CREATE TABLE itemrequests (
 CREATE TABLE logs (
     id          VARCHAR(36) PRIMARY KEY,
     cat         VARCHAR(50) NOT NULL,   -- e.g. 'USER', 'TRANSACTION', ...
-    uid      VARCHAR(36) REFERENCES users(uid),  -- quoting "user" if we keep that as column name
+    uid         VARCHAR(36),  -- quoting "user" if we keep that as column name
     timestamp   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     description TEXT
 );

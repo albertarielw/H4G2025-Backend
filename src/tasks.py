@@ -29,6 +29,7 @@ def get_all_tasks():
 
 
 @tasks_bp.route('/tasks/create', methods=['POST'])
+@user_logged_in(is_admin=True)
 def create_task():
     """
     /tasks/create - POST
@@ -39,12 +40,14 @@ def create_task():
     if not task_data:
         return jsonify({"success": False, "message": "No task data"}), 400
 
+    task_id = uuid.uuid4().hex
+    
     new_task = Task(
-        id=task_data.get("id"),
+        id=task_id,
         name=task_data.get("name"),
         created_by=task_data.get("created_by"),
         reward=task_data.get("reward", 0.0),
-        deadline=task_data.get("deadline"),   # format: "YYYY-MM-DD HH:MM:SS+00"
+        deadline=task_data.get("deadline"),
         user_limit=task_data.get("user_limit", 0),
         description=task_data.get("description"),
         require_review=task_data.get("require_review", False),
@@ -53,10 +56,11 @@ def create_task():
     )
     db.session.add(new_task)
     db.session.commit()
-    return jsonify({"success": True, "message": "Task created"}), 201
+    return jsonify({"success": True, "id": task_id, "message": "Task created"}), 201
 
 
 @tasks_bp.route('/tasks/update', methods=['PATCH'])
+@user_logged_in(is_admin=True)
 def update_task():
     """
     /tasks/update - PATCH
@@ -86,6 +90,7 @@ def update_task():
 
 
 @tasks_bp.route('/tasks/delete', methods=['DELETE'])
+@user_logged_in(is_admin=True)
 def delete_task():
     """
     /tasks/delete - DELETE
