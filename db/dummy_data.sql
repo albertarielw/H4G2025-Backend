@@ -23,25 +23,25 @@ VALUES
 ------------------------------------------------------------------------------
 -- TASKS
 ------------------------------------------------------------------------------
-INSERT INTO tasks (id, name, created_by, reward, deadline, user_limit, description, 
-                   require_review, require_proof, is_recurring)
+INSERT INTO tasks (id, name, created_by, reward, start_time, end_time, recurrence_interval, description, 
+                   require_review, require_proof)
 VALUES
-('t0001', 'Write Blog Post', 'u0002', 10.00, '2025-12-31 23:59:59+00', 3, 'Write a post about new features', TRUE, TRUE, FALSE),
-('t0002', 'Design Logo', 'u0002', 25.00, '2025-06-30 23:59:59+00', 2, 'Create a brand logo', TRUE, FALSE, FALSE),
-('t0003', 'Translate Document', 'u0002', 15.00, '2025-05-15 23:59:59+00', 5, 'Translate the user manual', FALSE, FALSE, FALSE),
-('t0004', 'Weekly Cleanup', 'u0002', 5.00, '2025-12-31 23:59:59+00', 10, 'Clean up shared folder', FALSE, FALSE, TRUE),
-('t0005', 'Survey Feedback', 'u0002', 2.50, '2026-01-01 23:59:59+00', 100, 'Fill out a short survey', FALSE, FALSE, FALSE);
+('t0001', 'Write Blog Post', 'u0002', 10.00, '2025-12-31 23:59:59+00', '2026-01-01 23:59:59+00', 3, 'Write a post about new features', TRUE, TRUE),
+('t0002', 'Design Logo', 'u0002', 25.00, '2025-06-30 23:59:59+00', '2025-07-01 23:59:59+00', 2, 'Create a brand logo', TRUE, FALSE),
+('t0003', 'Translate Document', 'u0002', 15.00, '2025-05-15 23:59:59+00', '2025-05-16 23:59:59+00', 5, 'Translate the user manual', FALSE, FALSE),
+('t0004', 'Weekly Cleanup', 'u0002', 5.00, '2025-12-31 23:59:59+00', '2026-01-01 23:59:59+00', 10, 'Clean up shared folder', FALSE, FALSE),
+('t0005', 'Survey Feedback', 'u0002', 2.50, '2026-01-01 23:59:59+00', '2026-01-02 23:59:59+00', 100, 'Fill out a short survey', FALSE, FALSE);
 
 ------------------------------------------------------------------------------
 -- USERTASKS
 ------------------------------------------------------------------------------
-INSERT INTO usertasks (id, uid, task, status, proof_of_completion, admin_comment)
+INSERT INTO usertasks (id, uid, task, start_time, end_time, status, proof_of_completion, admin_comment)
 VALUES
-('ut0001', 'u0001', 't0001', 'APPLIED', NULL, ''),
-('ut0002', 'u0001', 't0002', 'REJECTED', NULL, ''),
-('ut0003', 'u0003', 't0003', 'ONGOING', NULL, ''),
-('ut0004', 'u0004', 't0004', 'COMPLETED', NULL, ''),
-('ut0005', 'u0005', 't0005', 'APPLIED', NULL, '');
+('ut0001', 'u0001', 't0001', '2025-12-31 23:59:59+00', '2026-01-01 23:59:59+00','ONGOING', NULL, ''),
+('ut0002', 'u0001', 't0002', '2025-12-31 23:59:59+00', '2026-01-01 23:59:59+00', 'ONGOING', NULL, ''),
+('ut0003', 'u0003', 't0003', '2025-12-31 23:59:59+00', '2026-01-01 23:59:59+00', 'ONGOING', NULL, ''),
+('ut0004', 'u0004', 't0004', '2025-12-31 23:59:59+00', '2026-01-01 23:59:59+00', 'ONGOING', NULL, ''),
+('ut0005', 'u0005', 't0005', '2025-12-31 23:59:59+00', '2026-01-01 23:59:59+00','ONGOING', NULL, '');
 
 ------------------------------------------------------------------------------
 -- TRANSACTIONS

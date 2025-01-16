@@ -62,7 +62,7 @@ class TaskApplication(db.Model):
     __tablename__ = "task_applications"
     id = db.Column(db.String(36), primary_key=True)
     posting = db.Column(db.String(36), db.ForeignKey("task_postings.id"), nullable=False)
-    user = db.Column(db.String(36), db.ForeignKey("users.uid"), nullable=False)
+    applicant = db.Column(db.String(36), db.ForeignKey("users.uid"), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     comment = db.Column(db.Text)
 

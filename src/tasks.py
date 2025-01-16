@@ -354,7 +354,7 @@ def apply_task_posting(posting_id):
     new_application = TaskApplication(
         id=uuid.uuid4().hex,
         posting=posting_id,
-        user=current_user.uid,
+        applicant=current_user.uid,
         status="PENDING",
     )
     new_log_item = Log(
@@ -387,7 +387,7 @@ def get_task_applications():
             {
                 "id": ta.id,
                 "posting": ta.posting,
-                "user": ta.user,
+                "applicant": ta.applicant,
                 "status": ta.status,
                 "comment": ta.comment,
             }
@@ -449,7 +449,7 @@ def review_task_application(application_id):
     task = Task.query.filter_by(id=task_posting.task).first()
 
     if will_approve:
-        user_tasks = create_user_tasks(task, task_application.user)
+        user_tasks = create_user_tasks(task, task_application.applicant)
         db.session.add_all(user_tasks)
         task_application.status = "APPROVED"
         task_application.comment = data.get("comment")
@@ -458,7 +458,7 @@ def review_task_application(application_id):
             uid=current_user.uid,
             cat="TASK",
             timestamp=db.func.current_timestamp(),
-            description=f"Admin {current_user.uid} approved task {task.id} for user {task_application.user}",
+            description=f"Admin {current_user.uid} approved task {task.id} for user {task_application.applicant}",
         )
     else:
         task_application.status = "REJECTED"
@@ -468,7 +468,7 @@ def review_task_application(application_id):
             uid=current_user.uid,
             cat="TASK",
             timestamp=db.func.current_timestamp(),
-            description=f"Admin {current_user.uid} rejected task {task.id} for user {task_application.user}",
+            description=f"Admin {current_user.uid} rejected task {task.id} for user {task_application.applicant}",
         )
     db.session.add(log_item)
     db.session.commit()

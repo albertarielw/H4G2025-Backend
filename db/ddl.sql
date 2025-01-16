@@ -30,7 +30,7 @@ CREATE TABLE tasks (
     recurrence_interval INT,  -- e.g. 1 for daily, 7 for weekly, etc. Not recurring if NULL
     description         TEXT,
     require_review      BOOLEAN DEFAULT FALSE,
-    require_proof       BOOLEAN DEFAULT FALSE,
+    require_proof       BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE task_postings (
@@ -43,7 +43,7 @@ CREATE TABLE task_postings (
 CREATE TABLE task_applications (
     id              VARCHAR(36) PRIMARY KEY,
     posting         VARCHAR(36) NOT NULL REFERENCES task_postings(id),
-    user            VARCHAR(36) NOT NULL REFERENCES users(uid),
+    applicant       VARCHAR(36) NOT NULL REFERENCES users(uid),
     status          VARCHAR(50) NOT NULL,  -- e.g. 'PENDING', 'APPROVED', 'REJECTED'
     comment         TEXT
 );
@@ -57,7 +57,7 @@ CREATE TABLE task_requests (
     status                  VARCHAR(50) NOT NULL,  -- e.g. 'PENDING', 'APPROVED', 'REJECTED'
     start_time              TIMESTAMP WITH TIME ZONE,
     end_time                TIMESTAMP WITH TIME ZONE,
-    recurrence_interval     INT,  -- e.g. 1 for daily, 7 for weekly, etc. Not recurring if NULL
+    recurrence_interval     INT  -- e.g. 1 for daily, 7 for weekly, etc. Not recurring if NULL
 );
 
 -- 4) USERTASK (Association between User and Task)
