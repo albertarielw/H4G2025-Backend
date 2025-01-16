@@ -42,7 +42,6 @@ def get_user_by_uid(uid):
                 "start_time": t.start_time,
                 "end_time": t.end_time,
                 "recurrence_interval": t.recurrence_interval,
-                "user_limit": t.user_limit,
                 "description": t.description,
                 "require_review": t.require_review,
                 "require_proof": t.require_proof,
