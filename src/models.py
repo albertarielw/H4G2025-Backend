@@ -87,7 +87,7 @@ class TaskRequest(db.Model):
 
 
 class UserTask(db.Model):
-    __tablename__ = 'usertasks'
+    __tablename__ = "usertasks"
     id = db.Column(db.String(36), primary_key=True)
     uid = db.Column(db.String(36), db.ForeignKey('users.uid'), nullable=False)
     task = db.Column(db.String(36), db.ForeignKey('tasks.id'), nullable=False)

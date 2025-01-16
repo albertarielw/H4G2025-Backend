@@ -373,9 +373,14 @@ def apply_task_posting(posting_id):
 @tasks_bp.route("/tasks/applications", methods=["GET"])
 def get_task_applications():
     """
-    /tasks/postings/<string:posting_id>/applications - GET
+    /tasks/postings/applications - GET
     """
-    task_applications = TaskApplication.query.all()
+    posting_id = request.args.get("posting_id")
+    if posting_id:
+        task_applications = TaskApplication.query.filter_by(uid=posting_id).all()
+    else:
+        task_applications = TaskApplication.query.all()
+
     output = []
     for ta in task_applications:
         output.append(
