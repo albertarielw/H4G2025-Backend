@@ -12,7 +12,7 @@ from tasks import tasks_bp
 from usertasks import usertasks_bp
 from transcations import transactions_bp
 from logs import logs_bp
-
+from asgiref.wsgi import WsgiToAsgi
 
 def create_app(config_class=BaseConfig):
     flask_app = Flask(__name__)
@@ -28,11 +28,12 @@ def create_app(config_class=BaseConfig):
     flask_app.register_blueprint(transactions_bp)
     flask_app.register_blueprint(logs_bp)
 
-    return flask_app
+    return WsgiToAsgi(flask_app)
 
 
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():
         db.create_all()
+    
     app.run(debug=True, host='0.0.0.0', port=5123)
