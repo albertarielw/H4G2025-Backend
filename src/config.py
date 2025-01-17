@@ -7,7 +7,8 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class BaseConfig:
     # Dummy DB URL: postgresql://username:password@localhost/database
-    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI", "postgresql://h4g:h4g@localhost/h4g")
+    database_url = os.getenv('DB_URI')
+    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI", database_url)
     SQLALCHEMY_TRACK_MODIFICATIONS = os.environ.get("SQLALCHEMY_TRACK_MODIFICATIONS", False)
 
     # For session security, etc. — set your own secret key
