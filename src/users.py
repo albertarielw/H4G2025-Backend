@@ -40,11 +40,9 @@ def get_user_by_uid(uid):
                 "created_by": t.created_by,
                 "reward": t.reward,
                 "start_time": t.start_time,
-                "end_time": t.end_time,
+                "deadline": t.deadline,
                 "recurrence_interval": t.recurrence_interval,
                 "description": t.description,
-                "require_review": t.require_review,
-                "require_proof": t.require_proof,
             }
         )
 
