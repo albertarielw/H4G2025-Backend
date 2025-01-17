@@ -26,38 +26,10 @@ CREATE TABLE tasks (
     created_by          VARCHAR(36) NOT NULL REFERENCES users(uid),
     reward              DECIMAL(10,2) DEFAULT 0.00 CHECK (reward >= 0),
     start_time          TIMESTAMP WITH TIME ZONE,
-    end_time            TIMESTAMP WITH TIME ZONE,
+    deadline            TIMESTAMP WITH TIME ZONE,
+    is_recurring        BOOLEAN,
     recurrence_interval INT,  -- e.g. 1 for daily, 7 for weekly, etc. Not recurring if NULL
-    description         TEXT,
-    require_review      BOOLEAN DEFAULT FALSE,
-    require_proof       BOOLEAN DEFAULT FALSE
-);
-
-CREATE TABLE task_postings (
-    id                  VARCHAR(36) PRIMARY KEY,
-    task                VARCHAR(36) NOT NULL REFERENCES tasks(id),
-    user_limit          INT DEFAULT 0,
-    is_open             BOOLEAN DEFAULT TRUE
-);
-
-CREATE TABLE task_applications (
-    id              VARCHAR(36) PRIMARY KEY,
-    posting         VARCHAR(36) NOT NULL REFERENCES task_postings(id),
-    applicant       VARCHAR(36) NOT NULL REFERENCES users(uid),
-    status          VARCHAR(50) NOT NULL,  -- e.g. 'PENDING', 'APPROVED', 'REJECTED'
-    comment         TEXT
-);
-
-CREATE TABLE task_requests (
-    id                      VARCHAR(36) PRIMARY KEY,
-    created_by              VARCHAR(36) NOT NULL REFERENCES users(uid),
-    name                    VARCHAR(255) NOT NULL,
-    description             TEXT,
-    reward                  DECIMAL(10,2) DEFAULT 0.00 CHECK (reward >= 0),
-    status                  VARCHAR(50) NOT NULL,  -- e.g. 'PENDING', 'APPROVED', 'REJECTED'
-    start_time              TIMESTAMP WITH TIME ZONE,
-    end_time                TIMESTAMP WITH TIME ZONE,
-    recurrence_interval     INT  -- e.g. 1 for daily, 7 for weekly, etc. Not recurring if NULL
+    description         TEXT
 );
 
 -- 4) USERTASK (Association between User and Task)
@@ -67,8 +39,7 @@ CREATE TABLE usertasks (
     task                VARCHAR(36) NOT NULL REFERENCES tasks(id),
     start_time          TIMESTAMP WITH TIME ZONE,
     end_time            TIMESTAMP WITH TIME ZONE,
-    status              VARCHAR(50) NOT NULL,  -- e.g. 'ONGOING', 'CHANGES_REQUESTED", 'UNDER_REVIEW', 'COMPLETED'
-    proof_of_completion BYTEA,
+    status              VARCHAR(50) NOT NULL,  -- e.g. APPLIED, REJECTED, ONGOING, UNDER_REVIEW, COMPLETED
     admin_comment       TEXT
 );
 

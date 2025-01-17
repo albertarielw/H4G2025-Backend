@@ -10,7 +10,6 @@ from users import users_bp
 from items import items_bp
 from tasks import tasks_bp
 from usertasks import usertasks_bp
-from itemrequests import itemrequests_bp
 from transcations import transactions_bp
 from logs import logs_bp
 
@@ -26,7 +25,6 @@ def create_app(config_class=BaseConfig):
     flask_app.register_blueprint(items_bp)
     flask_app.register_blueprint(tasks_bp)
     flask_app.register_blueprint(usertasks_bp)
-    flask_app.register_blueprint(itemrequests_bp)
     flask_app.register_blueprint(transactions_bp)
     flask_app.register_blueprint(logs_bp)
 
