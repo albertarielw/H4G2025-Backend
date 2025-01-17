@@ -14,11 +14,11 @@ VALUES
 ------------------------------------------------------------------------------
 INSERT INTO items (id, name, image, stock, price, description)
 VALUES
-('i0001', 'Laptop',   'https://example.com/laptop.jpg',  5,  1200, 'High-end laptop'),
-('i0002', 'Phone',    'https://example.com/phone.jpg',  10,   800, 'Latest smartphone'),
-('i0003', 'Monitor',  'https://example.com/monitor.jpg',  3,   300, '4K monitor'),
-('i0004', 'Headset',  'https://example.com/headset.jpg', 20,    50, 'Noise-cancelling headset'),
-('i0005', 'Keyboard', 'https://example.com/keyboard.jpg', 15,    90, 'Mechanical keyboard');
+('i0001', 'Laptop',   'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664.jpg',  5,  1200, 'High-end laptop'),
+('i0002', 'Phone',    'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664.jpg',  10,   800, 'Latest smartphone'),
+('i0003', 'Monitor',  'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664.jpg',  3,   300, '4K monitor'),
+('i0004', 'Headset',  'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664.jpg', 20,    50, 'Noise-cancelling headset'),
+('i0005', 'Keyboard', 'https://as1.ftcdn.net/v2/jpg/00/92/53/56/1000_F_92535664.jpg', 15,    90, 'Mechanical keyboard');
 
 ------------------------------------------------------------------------------
 -- TASKS
