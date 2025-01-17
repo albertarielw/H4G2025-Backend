@@ -17,7 +17,7 @@ VALUES
 ('i0001', 'Laptop',   'https://t3.ftcdn.net/jpg/00/92/53/56/360_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg',  5,  1200, 'High-end laptop'),
 ('i0002', 'Phone',    'https://t3.ftcdn.net/jpg/00/92/53/56/360_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg',  10,   800, 'Latest smartphone'),
 ('i0003', 'Monitor',  'https://t3.ftcdn.net/jpg/00/92/53/56/360_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg',  3,   300, '4K monitor'),
-('i0004', 'Headset',  'hhttps://t3.ftcdn.net/jpg/00/92/53/56/360_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg', 20,    50, 'Noise-cancelling headset'),
+('i0004', 'Headset',  'https://t3.ftcdn.net/jpg/00/92/53/56/360_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg', 20,    50, 'Noise-cancelling headset'),
 ('i0005', 'Keyboard', 'https://t3.ftcdn.net/jpg/00/92/53/56/360_F_92535664_IvFsQeHjBzfE6sD4VHdO8u5OHUSc6yHF.jpg', 15,    90, 'Mechanical keyboard');
 
 ------------------------------------------------------------------------------
